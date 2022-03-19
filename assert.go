@@ -23,15 +23,15 @@ func Error(t testing.TB, err error) {
 
 // ErrorIs asserts that the error wraps the expected error according to the
 // semantics of errors.Is.
-func ErrorIs(t testing.TB, expected, got error) {
-	if !errors.Is(got, expected) {
+func ErrorIs(t testing.TB, err, target error) {
+	if !errors.Is(err, target) {
 		t.Helper()
-		t.Errorf(`expected error "%v", got "%v"`, expected, got)
+		t.Errorf(`expected error "%v", got "%v"`, target, err)
 	}
 }
 
 // Equal asserts that two comparable values are equivalent.
-func Equal[T comparable](t testing.TB, expected, got T) {
+func Equal[T comparable](t testing.TB, got, expected T) {
 	if expected != got {
 		t.Helper()
 		t.Errorf(`expected "%v", got "%v"`, expected, got)
@@ -39,7 +39,7 @@ func Equal[T comparable](t testing.TB, expected, got T) {
 }
 
 // NotEqual asserts that two comparable values are not equivalent.
-func NotEqual[T comparable](t testing.TB, expected, got T) {
+func NotEqual[T comparable](t testing.TB, got, expected T) {
 	if expected == got {
 		t.Helper()
 		t.Errorf(`expect "%v" to not equal "%v"`, got, expected)
