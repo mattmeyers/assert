@@ -300,3 +300,203 @@ func TestNotEqual(t *testing.T) {
 		})
 	}
 }
+
+func TestDeepEqual(t *testing.T) {
+	mockT := newMockTB()
+
+	type Foo struct {
+		Bar string
+		Baz int
+	}
+
+	type args struct {
+		t        *mockTB
+		got      any
+		expected any
+	}
+	tests := []struct {
+		name          string
+		args          args
+		expectedCalls int
+	}{
+		{
+			name: "Equal structs",
+			args: args{
+				t:        mockT,
+				got:      Foo{Bar: "bar", Baz: 1},
+				expected: Foo{Bar: "bar", Baz: 1},
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "Equal structs (pointers)",
+			args: args{
+				t:        mockT,
+				got:      &Foo{Bar: "bar", Baz: 1},
+				expected: &Foo{Bar: "bar", Baz: 1},
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "Not equal structs",
+			args: args{
+				t:        mockT,
+				got:      Foo{Bar: "bar", Baz: 1},
+				expected: Foo{Bar: "blah", Baz: 0},
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "Equal slices",
+			args: args{
+				t:        mockT,
+				got:      []int{1, 2, 3},
+				expected: []int{1, 2, 3},
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "Not equal slices",
+			args: args{
+				t:        mockT,
+				got:      []int{1, 2, 3},
+				expected: []int{4, 5, 6},
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "Equal primitives",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 1,
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "Not equal primitives",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 2,
+			},
+			expectedCalls: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.t.Reset()
+
+			DeepEqual(tt.args.t, tt.args.got, tt.args.expected)
+			n := len(tt.args.t.ErrorfCalls)
+
+			if n != tt.expectedCalls {
+				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)
+			}
+
+			if n != tt.args.t.HelperCalls {
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+			}
+		})
+	}
+}
+
+func TestNotDeepEqual(t *testing.T) {
+	mockT := newMockTB()
+
+	type Foo struct {
+		Bar string
+		Baz int
+	}
+
+	type args struct {
+		t        *mockTB
+		got      any
+		expected any
+	}
+	tests := []struct {
+		name          string
+		args          args
+		expectedCalls int
+	}{
+		{
+			name: "Equal structs",
+			args: args{
+				t:        mockT,
+				got:      Foo{Bar: "bar", Baz: 1},
+				expected: Foo{Bar: "bar", Baz: 1},
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "Equal structs (pointers)",
+			args: args{
+				t:        mockT,
+				got:      &Foo{Bar: "bar", Baz: 1},
+				expected: &Foo{Bar: "bar", Baz: 1},
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "Not equal structs",
+			args: args{
+				t:        mockT,
+				got:      Foo{Bar: "bar", Baz: 1},
+				expected: Foo{Bar: "blah", Baz: 0},
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "Equal slices",
+			args: args{
+				t:        mockT,
+				got:      []int{1, 2, 3},
+				expected: []int{1, 2, 3},
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "Not equal slices",
+			args: args{
+				t:        mockT,
+				got:      []int{1, 2, 3},
+				expected: []int{4, 5, 6},
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "Equal primitives",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 1,
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "Not equal primitives",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 2,
+			},
+			expectedCalls: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.t.Reset()
+
+			NotDeepEqual(tt.args.t, tt.args.got, tt.args.expected)
+			n := len(tt.args.t.ErrorfCalls)
+
+			if n != tt.expectedCalls {
+				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)
+			}
+
+			if n != tt.args.t.HelperCalls {
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+			}
+		})
+	}
+}

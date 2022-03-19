@@ -2,6 +2,7 @@ package assert
 
 import (
 	"errors"
+	"reflect"
 	"testing"
 )
 
@@ -41,6 +42,24 @@ func Equal[T comparable](t testing.TB, got, expected T) {
 // NotEqual asserts that two comparable values are not equivalent.
 func NotEqual[T comparable](t testing.TB, got, expected T) {
 	if expected == got {
+		t.Helper()
+		t.Errorf(`expect "%v" to not equal "%v"`, got, expected)
+	}
+}
+
+// DeepEqual asserts that two comparable values are equivalent using
+// reflect.DeepEqual.
+func DeepEqual[T, R any](t testing.TB, got T, expected R) {
+	if !reflect.DeepEqual(got, expected) {
+		t.Helper()
+		t.Errorf(`expected "%+v", got "%+v"`, expected, got)
+	}
+}
+
+// DeepEqual asserts that two comparable values are not equivalent
+// using reflect.DeepEqual.
+func NotDeepEqual[T, R any](t testing.TB, got T, expected R) {
+	if reflect.DeepEqual(got, expected) {
 		t.Helper()
 		t.Errorf(`expect "%v" to not equal "%v"`, got, expected)
 	}
