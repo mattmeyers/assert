@@ -184,6 +184,33 @@ func TestIsError(t *testing.T) {
 			},
 			expectedCalls: 1,
 		},
+		{
+			name: "Nil error, want nil",
+			args: args{
+				t:      mockT,
+				err:    nil,
+				target: nil,
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "Non nil error, want nil",
+			args: args{
+				t:      mockT,
+				err:    errors.New("uh oh"),
+				target: nil,
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "Non error, want non nil",
+			args: args{
+				t:      mockT,
+				err:    nil,
+				target: errors.New("uh oh"),
+			},
+			expectedCalls: 1,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -6,15 +6,17 @@ import (
 	"testing"
 )
 
-// NoError asserts that the error is nil.
+// NoError asserts that the error is nil. This assertion will trigger a t.Fatal
+// call if the error is not nil and is intended to be used when checking errors
+// not directly related to the test. For a non-fatal check, use ErrorIs.
 func NoError(t testing.TB, err error) {
 	if err != nil {
 		t.Helper()
-		t.Errorf(`expected no error, got "%+v"`, err)
+		t.Fatalf(`expected no error, got "%+v"`, err)
 	}
 }
 
-// Error asserts that the error is nil.
+// Error asserts that the error is not nil.
 func Error(t testing.TB, err error) {
 	if err == nil {
 		t.Helper()
