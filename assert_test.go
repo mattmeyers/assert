@@ -9,16 +9,17 @@ import (
 type mockTB struct {
 	*testing.T
 
-	ErrorCalls  []errorParams
-	ErrorfCalls []errorfParams
+	ErrorCalls  []messageParams
+	ErrorfCalls []formattedMessageParams
+	FatalfCalls []formattedMessageParams
 	HelperCalls int
 }
 
-type errorParams struct {
+type messageParams struct {
 	args []any
 }
 
-type errorfParams struct {
+type formattedMessageParams struct {
 	format string
 	args   []any
 }
@@ -26,24 +27,30 @@ type errorfParams struct {
 func newMockTB() *mockTB {
 	return &mockTB{
 		T:           &testing.T{},
-		ErrorCalls:  []errorParams{},
-		ErrorfCalls: []errorfParams{},
+		ErrorCalls:  []messageParams{},
+		ErrorfCalls: []formattedMessageParams{},
+		FatalfCalls: []formattedMessageParams{},
 		HelperCalls: 0,
 	}
 }
 
 func (t *mockTB) Reset() {
-	t.ErrorCalls = []errorParams{}
-	t.ErrorfCalls = []errorfParams{}
+	t.ErrorCalls = []messageParams{}
+	t.ErrorfCalls = []formattedMessageParams{}
+	t.FatalfCalls = []formattedMessageParams{}
 	t.HelperCalls = 0
 }
 
 func (t *mockTB) Error(args ...any) {
-	t.ErrorCalls = append(t.ErrorCalls, errorParams{args: args})
+	t.ErrorCalls = append(t.ErrorCalls, messageParams{args: args})
 }
 
 func (t *mockTB) Errorf(format string, args ...any) {
-	t.ErrorfCalls = append(t.ErrorfCalls, errorfParams{format: format, args: args})
+	t.ErrorfCalls = append(t.ErrorfCalls, formattedMessageParams{format: format, args: args})
+}
+
+func (t *mockTB) Fatalf(format string, args ...any) {
+	t.FatalfCalls = append(t.FatalfCalls, formattedMessageParams{args: args})
 }
 
 func (t *mockTB) Helper() {
@@ -129,7 +136,7 @@ func TestNoError(t *testing.T) {
 			tt.args.t.Reset()
 
 			NoError(tt.args.t, tt.args.err)
-			n := len(tt.args.t.ErrorfCalls)
+			n := len(tt.args.t.FatalfCalls)
 
 			if n != tt.expectedCalls {
 				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)
