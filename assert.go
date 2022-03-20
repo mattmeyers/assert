@@ -64,3 +64,23 @@ func NotDeepEqual[T, R any](t testing.TB, got T, expected R) {
 		t.Errorf(`expect "%v" to not equal "%v"`, got, expected)
 	}
 }
+
+// SliceContains asserts that a slice contains one or more values.
+func SliceContains[T comparable](t testing.TB, slice []T, values ...T) {
+	for _, v := range values {
+		sliceContains(t, slice, v)
+	}
+}
+
+// sliceContains is a private helper for checking the existence of a single
+// element in a slice.
+func sliceContains[T comparable](t testing.TB, slice []T, value T) {
+	for _, s := range slice {
+		if s == value {
+			return
+		}
+	}
+
+	t.Helper()
+	t.Errorf(`slice does not contain value "%v"`, value)
+}

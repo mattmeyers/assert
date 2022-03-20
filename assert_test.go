@@ -500,3 +500,79 @@ func TestNotDeepEqual(t *testing.T) {
 		})
 	}
 }
+
+func TestSliceContains(t *testing.T) {
+	mockT := newMockTB()
+	type args[T comparable] struct {
+		t      *mockTB
+		slice  []T
+		values []T
+	}
+	tests := []struct {
+		name          string
+		args          args[int]
+		expectedCalls int
+	}{
+		{
+			name: "Slice contains single element",
+			args: args[int]{
+				t:      mockT,
+				slice:  []int{1, 2, 3},
+				values: []int{2},
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "Slice contains multiple elements",
+			args: args[int]{
+				t:      mockT,
+				slice:  []int{1, 2, 3},
+				values: []int{3, 2},
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "Slice missing single element",
+			args: args[int]{
+				t:      mockT,
+				slice:  []int{1, 2, 3},
+				values: []int{4},
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "Slice missing multiple elements",
+			args: args[int]{
+				t:      mockT,
+				slice:  []int{1, 2, 3},
+				values: []int{4, 5},
+			},
+			expectedCalls: 2,
+		},
+		{
+			name: "Slice contains and is missing",
+			args: args[int]{
+				t:      mockT,
+				slice:  []int{1, 2, 3},
+				values: []int{4, 3, 2, 0},
+			},
+			expectedCalls: 2,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.t.Reset()
+
+			SliceContains(tt.args.t, tt.args.slice, tt.args.values...)
+			n := len(tt.args.t.ErrorfCalls)
+
+			if n != tt.expectedCalls {
+				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)
+			}
+
+			if n != tt.args.t.HelperCalls {
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+			}
+		})
+	}
+}
