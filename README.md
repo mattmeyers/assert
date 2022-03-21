@@ -43,11 +43,11 @@ func TestGetJSONContains3(t *testing.T) {
 
 	var values []int
 	err := json.Unmarshal([]byte(str), &values)
-    // Will fatally fail test if JSON is malformed
+	// Will fatally fail test if JSON is malformed
 	assert.NoError(assert.Fatal(t), err) 
 
 	assert.SliceContains(t, values, 3)
-    // Will fail test
+	// Will fail test
 	// assert.SliceContains(t, values, 9)}
-
+}
 ```
