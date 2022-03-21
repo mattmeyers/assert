@@ -6,13 +6,31 @@ import (
 	"testing"
 )
 
-// NoError asserts that the error is nil. This assertion will trigger a t.Fatal
-// call if the error is not nil and is intended to be used when checking errors
-// not directly related to the test. For a non-fatal check, use ErrorIs.
+// FatalTB is a wrapper around a testing.TB that converts all calls to Error
+// and Errorf to Fatal and Fatalf respectively. This can be used to convert
+// any assertion to a fatal assertion.
+type FatalTB struct {
+	testing.TB
+}
+
+// Fatal builds a FatalTB for converting an assertion to a fatal assertion.
+func Fatal(t testing.TB) *FatalTB {
+	return &FatalTB{TB: t}
+}
+
+func (t *FatalTB) Error(args ...any) {
+	t.TB.Fatal(args...)
+}
+
+func (t *FatalTB) Errorf(format string, args ...any) {
+	t.TB.Fatalf(format, args...)
+}
+
+// NoError asserts that the error is nil.
 func NoError(t testing.TB, err error) {
 	if err != nil {
 		t.Helper()
-		t.Fatalf(`expected no error, got "%+v"`, err)
+		t.Errorf(`expected no error, got "%+v"`, err)
 	}
 }
 

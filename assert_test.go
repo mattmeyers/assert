@@ -11,6 +11,7 @@ type mockTB struct {
 
 	ErrorCalls  []messageParams
 	ErrorfCalls []formattedMessageParams
+	FatalCalls  []messageParams
 	FatalfCalls []formattedMessageParams
 	HelperCalls int
 }
@@ -29,6 +30,7 @@ func newMockTB() *mockTB {
 		T:           &testing.T{},
 		ErrorCalls:  []messageParams{},
 		ErrorfCalls: []formattedMessageParams{},
+		FatalCalls:  []messageParams{},
 		FatalfCalls: []formattedMessageParams{},
 		HelperCalls: 0,
 	}
@@ -37,6 +39,7 @@ func newMockTB() *mockTB {
 func (t *mockTB) Reset() {
 	t.ErrorCalls = []messageParams{}
 	t.ErrorfCalls = []formattedMessageParams{}
+	t.FatalCalls = []messageParams{}
 	t.FatalfCalls = []formattedMessageParams{}
 	t.HelperCalls = 0
 }
@@ -49,12 +52,42 @@ func (t *mockTB) Errorf(format string, args ...any) {
 	t.ErrorfCalls = append(t.ErrorfCalls, formattedMessageParams{format: format, args: args})
 }
 
+func (t *mockTB) Fatal(args ...any) {
+	t.FatalCalls = append(t.FatalCalls, messageParams{args: args})
+}
+
 func (t *mockTB) Fatalf(format string, args ...any) {
 	t.FatalfCalls = append(t.FatalfCalls, formattedMessageParams{args: args})
 }
 
 func (t *mockTB) Helper() {
 	t.HelperCalls++
+}
+
+func TestFatalTBCallsFatal(t *testing.T) {
+	mockT := newMockTB()
+	Fatal(mockT).Error("foo")
+
+	if len(mockT.FatalCalls) != 1 {
+		t.Errorf("expected 1 call to Fatal(), got %d", len(mockT.FatalCalls))
+	}
+
+	if len(mockT.ErrorCalls) != 0 {
+		t.Errorf("expected 0 call to Error(), got %d", len(mockT.ErrorCalls))
+	}
+}
+
+func TestFatalTBCallsFatalf(t *testing.T) {
+	mockT := newMockTB()
+	Fatal(mockT).Errorf("foo")
+
+	if len(mockT.FatalfCalls) != 1 {
+		t.Errorf("expected 1 call to Fatalf(), got %d", len(mockT.FatalfCalls))
+	}
+
+	if len(mockT.ErrorfCalls) != 0 {
+		t.Errorf("expected 0 call to Errorf(), got %d", len(mockT.ErrorfCalls))
+	}
 }
 
 func TestError(t *testing.T) {
@@ -136,7 +169,7 @@ func TestNoError(t *testing.T) {
 			tt.args.t.Reset()
 
 			NoError(tt.args.t, tt.args.err)
-			n := len(tt.args.t.FatalfCalls)
+			n := len(tt.args.t.ErrorfCalls)
 
 			if n != tt.expectedCalls {
 				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)

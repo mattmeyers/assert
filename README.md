@@ -12,7 +12,7 @@ go get -u github.com/mattmeyers/assert
 
 ## Usage
 
-The assertions found within this library can replace any simple assertion logic normally found in tests. All assertions are marked as `t.Helper`s so stack traces will point to the appropriate line in the test. Additionally, all tests are non fatal unless otherwise specified.
+The assertions found within this library can replace any simple assertion logic normally found in tests. All assertions are marked as `t.Helper`s so stack traces will point to the appropriate line in the test. Additionally, all assertions are not fatal by default. To convert an assertion to a fatal assertion, the `*testing.T` struct can be wrapped with `Fatal()`.
 
 For example, consider the following function that returns a stringified JSON array.
 
@@ -43,10 +43,11 @@ func TestGetJSONContains3(t *testing.T) {
 
 	var values []int
 	err := json.Unmarshal([]byte(str), &values)
-	assert.NoError(t, err) // Will fatally fail test if JSON is malformed
+    // Will fatally fail test if JSON is malformed
+	assert.NoError(assert.Fatal(t), err) 
 
 	assert.SliceContains(t, values, 3)
-	assert.SliceContains(t, values, 9) // Will fail test
-}
+    // Will fail test
+	// assert.SliceContains(t, values, 9)}
 
 ```
