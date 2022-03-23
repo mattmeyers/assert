@@ -85,6 +85,46 @@ func NotDeepEqual[T, R any](t testing.TB, got T, expected R) {
 	}
 }
 
+// Ordered represents all types that support the <, <=, >=, and > operators.
+type Ordered interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64 |
+		~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr |
+		~float32 | ~float64 |
+		~string
+}
+
+// GreaterThan asserts that a value is greater than an expected value.
+func GreaterThan[T Ordered](t testing.TB, got, expected T) {
+	if got <= expected {
+		t.Helper()
+		t.Errorf(`expected "%v" to be greater than "%v"`, got, expected)
+	}
+}
+
+// GreaterThanOrEqual asserts a values is greater than or equal to an expected value.
+func GreaterThanOrEqual[T Ordered](t testing.TB, got, expected T) {
+	if got < expected {
+		t.Helper()
+		t.Errorf(`expected "%v" to be greater than or equal to "%v"`, got, expected)
+	}
+}
+
+// LessThan than asserts a values is less than to an expected value.
+func LessThan[T Ordered](t testing.TB, got, expected T) {
+	if got >= expected {
+		t.Helper()
+		t.Errorf(`expected "%v" to be less than "%v"`, got, expected)
+	}
+}
+
+// LessThanOrEqual asserts a values is less than or equal to an expected value.
+func LessThanOrEqual[T Ordered](t testing.TB, got, expected T) {
+	if got > expected {
+		t.Helper()
+		t.Errorf(`expected "%v" to be less than or equal to "%v"`, got, expected)
+	}
+}
+
 // SliceContains asserts that a slice contains one or more values.
 func SliceContains[T comparable](t testing.TB, slice []T, values ...T) {
 	for _, v := range values {

@@ -568,6 +568,238 @@ func TestNotDeepEqual(t *testing.T) {
 	}
 }
 
+func TestGreaterThan(t *testing.T) {
+	mockT := newMockTB()
+	type args struct {
+		t        *mockTB
+		got      int
+		expected int
+	}
+	tests := []struct {
+		name          string
+		args          args
+		expectedCalls int
+	}{
+		{
+			name: "2 > 1: true",
+			args: args{
+				t:        mockT,
+				got:      2,
+				expected: 1,
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "1 > 1: false",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 1,
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "1 > 2: false",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 2,
+			},
+			expectedCalls: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.t.Reset()
+
+			GreaterThan(tt.args.t, tt.args.got, tt.args.expected)
+			n := len(tt.args.t.ErrorfCalls)
+
+			if n != tt.expectedCalls {
+				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)
+			}
+
+			if n != tt.args.t.HelperCalls {
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+			}
+		})
+	}
+}
+
+func TestGreaterThanOrEqual(t *testing.T) {
+	mockT := newMockTB()
+	type args struct {
+		t        *mockTB
+		got      int
+		expected int
+	}
+	tests := []struct {
+		name          string
+		args          args
+		expectedCalls int
+	}{
+		{
+			name: "2 >= 1: true",
+			args: args{
+				t:        mockT,
+				got:      2,
+				expected: 1,
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "1 >= 1: true",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 1,
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "1 >= 2: false",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 2,
+			},
+			expectedCalls: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.t.Reset()
+
+			GreaterThanOrEqual(tt.args.t, tt.args.got, tt.args.expected)
+			n := len(tt.args.t.ErrorfCalls)
+
+			if n != tt.expectedCalls {
+				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)
+			}
+
+			if n != tt.args.t.HelperCalls {
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+			}
+		})
+	}
+}
+
+func TestLessThan(t *testing.T) {
+	mockT := newMockTB()
+	type args struct {
+		t        *mockTB
+		got      int
+		expected int
+	}
+	tests := []struct {
+		name          string
+		args          args
+		expectedCalls int
+	}{
+		{
+			name: "2 < 1: false",
+			args: args{
+				t:        mockT,
+				got:      2,
+				expected: 1,
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "1 < 1: false",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 1,
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "1 < 2: true",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 2,
+			},
+			expectedCalls: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.t.Reset()
+
+			LessThan(tt.args.t, tt.args.got, tt.args.expected)
+			n := len(tt.args.t.ErrorfCalls)
+
+			if n != tt.expectedCalls {
+				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)
+			}
+
+			if n != tt.args.t.HelperCalls {
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+			}
+		})
+	}
+}
+
+func TestLessThanOrEqual(t *testing.T) {
+	mockT := newMockTB()
+	type args struct {
+		t        *mockTB
+		got      int
+		expected int
+	}
+	tests := []struct {
+		name          string
+		args          args
+		expectedCalls int
+	}{
+		{
+			name: "2 <= 1: false",
+			args: args{
+				t:        mockT,
+				got:      2,
+				expected: 1,
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "1 <= 1: true",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 1,
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "1 <= 2: true",
+			args: args{
+				t:        mockT,
+				got:      1,
+				expected: 2,
+			},
+			expectedCalls: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.t.Reset()
+
+			LessThanOrEqual(tt.args.t, tt.args.got, tt.args.expected)
+			n := len(tt.args.t.ErrorfCalls)
+
+			if n != tt.expectedCalls {
+				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)
+			}
+
+			if n != tt.args.t.HelperCalls {
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+			}
+		})
+	}
+}
+
 func TestSliceContains(t *testing.T) {
 	mockT := newMockTB()
 	type args[T comparable] struct {
