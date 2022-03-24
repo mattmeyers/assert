@@ -144,3 +144,24 @@ func sliceContains[T comparable](t testing.TB, slice []T, value T) {
 	t.Helper()
 	t.Errorf(`slice does not contain value "%v"`, value)
 }
+
+// MapContains asserts that a map contains the provided key-value pair.
+func MapContains[K, V comparable](t testing.TB, m map[K]V, key K, value V) {
+	t.Helper()
+	v, ok := m[key]
+	if !ok {
+		t.Errorf(`map does not contain key-value pair "%v: %v"`, key, value)
+	} else if v != value {
+		t.Errorf(`map contains key %v but not value %v`, key, value)
+	}
+}
+
+// MapContainsKey asserts that the given map contains the provided keys.
+func MapContainsKey[K comparable, V any](t testing.TB, m map[K]V, keys ...K) {
+	for _, k := range keys {
+		if _, ok := m[k]; !ok {
+			t.Helper()
+			t.Errorf(`map does not contain key "%v"`, k)
+		}
+	}
+}

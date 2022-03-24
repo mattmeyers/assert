@@ -875,3 +875,114 @@ func TestSliceContains(t *testing.T) {
 		})
 	}
 }
+
+func TestMapContains(t *testing.T) {
+	mockT := newMockTB()
+	type args struct {
+		t     *mockTB
+		m     map[string]int
+		key   string
+		value int
+	}
+	tests := []struct {
+		name          string
+		args          args
+		expectedCalls int
+	}{
+		{
+			name: "Contains key/value",
+			args: args{
+				t:     mockT,
+				m:     map[string]int{"foo": 1, "bar": 2},
+				key:   "foo",
+				value: 1,
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "Does not contain key",
+			args: args{
+				t:     mockT,
+				m:     map[string]int{"foo": 1, "bar": 2},
+				key:   "baz",
+				value: 1,
+			},
+			expectedCalls: 1,
+		},
+		{
+			name: "Contains key but not value",
+			args: args{
+				t:     mockT,
+				m:     map[string]int{"foo": 1, "bar": 2},
+				key:   "foo",
+				value: 3,
+			},
+			expectedCalls: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.t.Reset()
+
+			MapContains(tt.args.t, tt.args.m, tt.args.key, tt.args.value)
+			n := len(tt.args.t.ErrorfCalls)
+
+			if n != tt.expectedCalls {
+				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)
+			}
+
+			if n != tt.args.t.HelperCalls {
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+			}
+		})
+	}
+}
+
+func TestMapContainsKey(t *testing.T) {
+	mockT := newMockTB()
+	type args struct {
+		t    *mockTB
+		m    map[string]int
+		keys []string
+	}
+	tests := []struct {
+		name          string
+		args          args
+		expectedCalls int
+	}{
+		{
+			name: "Contains multiple keys",
+			args: args{
+				t:    mockT,
+				m:    map[string]int{"foo": 1, "bar": 2},
+				keys: []string{"bar", "foo"},
+			},
+			expectedCalls: 0,
+		},
+		{
+			name: "Contains key but missing others",
+			args: args{
+				t:    mockT,
+				m:    map[string]int{"foo": 1, "bar": 2},
+				keys: []string{"bar", "baz", "blah"},
+			},
+			expectedCalls: 2,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.t.Reset()
+
+			MapContainsKey(tt.args.t, tt.args.m, tt.args.keys...)
+			n := len(tt.args.t.ErrorfCalls)
+
+			if n != tt.expectedCalls {
+				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)
+			}
+
+			if n != tt.args.t.HelperCalls {
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+			}
+		})
+	}
+}
