@@ -1,5 +1,7 @@
 # assert
 
+![Build](https://github.com/mattmeyers/assert/actions/workflows/build.yml/badge.svg)
+
 `assert` is an opinionated test assertion libary. It is not intended to fulfill every use case and is not intended to be flexible/extendable.
 
 ## Installing
