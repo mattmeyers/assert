@@ -3,6 +3,7 @@ package assert
 import (
 	"errors"
 	"reflect"
+	"regexp"
 	"testing"
 )
 
@@ -163,5 +164,32 @@ func MapContainsKey[K comparable, V any](t testing.TB, m map[K]V, keys ...K) {
 			t.Helper()
 			t.Errorf(`map does not contain key "%v"`, k)
 		}
+	}
+}
+
+// regexCache holds all compiled regular expressions. The string pattern input
+// is used as the key in the map.
+var regexCache = make(map[string]*regexp.Regexp)
+
+// RegexMatches asserts that a provided string is matched by the provided pattern.
+// In order to avoid compiling regular expressions many times, they are compiled
+// once and cached for future use.
+func RegexMatches(t testing.TB, got string, pattern string) {
+	r, ok := regexCache[pattern]
+	if !ok {
+		var err error
+		r, err = regexp.Compile(pattern)
+		if err != nil {
+			t.Helper()
+			t.Fatalf("failed to compile regular expression: %v", err)
+			return
+		}
+
+		regexCache[pattern] = r
+	}
+
+	if !r.MatchString(got) {
+		t.Helper()
+		t.Errorf("received string %s not matched by pattern /%s/", got, pattern)
 	}
 }

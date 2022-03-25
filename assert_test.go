@@ -3,6 +3,7 @@ package assert
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"testing"
 )
 
@@ -130,7 +131,7 @@ func TestError(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -176,7 +177,7 @@ func TestNoError(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -264,7 +265,7 @@ func TestIsError(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -313,7 +314,7 @@ func TestEqual(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -362,7 +363,7 @@ func TestNotEqual(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -462,7 +463,7 @@ func TestDeepEqual(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -562,7 +563,7 @@ func TestNotDeepEqual(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -620,7 +621,7 @@ func TestGreaterThan(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -678,7 +679,7 @@ func TestGreaterThanOrEqual(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -736,7 +737,7 @@ func TestLessThan(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -794,7 +795,7 @@ func TestLessThanOrEqual(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -870,7 +871,7 @@ func TestSliceContains(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -932,7 +933,7 @@ func TestMapContains(t *testing.T) {
 			}
 
 			if tt.args.t.HelperCalls != 1 {
-				t.Errorf("expected 1 call to Helper(), got %d", n)
+				t.Errorf("expected 1 call to Helper(), got %d", tt.args.t.HelperCalls)
 			}
 		})
 	}
@@ -981,7 +982,75 @@ func TestMapContainsKey(t *testing.T) {
 			}
 
 			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, tt.args.t.HelperCalls)
+			}
+		})
+	}
+}
+
+func TestRegexMatches(t *testing.T) {
+	mockT := newMockTB()
+	type args struct {
+		t       *mockTB
+		got     string
+		pattern string
+	}
+	tests := []struct {
+		name               string
+		args               args
+		expectedFatalCalls int
+		expectedErrorCalls int
+	}{
+		{
+			name: "Basic match",
+			args: args{
+				t:       mockT,
+				got:     "abc123",
+				pattern: `\w{3}\d{3}`,
+			},
+			expectedFatalCalls: 0,
+			expectedErrorCalls: 0,
+		},
+		{
+			name: "No match",
+			args: args{
+				t:       mockT,
+				got:     "...",
+				pattern: `\w{3}\d{3}`,
+			},
+			expectedFatalCalls: 0,
+			expectedErrorCalls: 1,
+		},
+		{
+			name: "Invalid regex",
+			args: args{
+				t:       mockT,
+				got:     "abc123",
+				pattern: `\1`,
+			},
+			expectedFatalCalls: 1,
+			expectedErrorCalls: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.args.t.Reset()
+			regexCache = make(map[string]*regexp.Regexp)
+
+			RegexMatches(tt.args.t, tt.args.got, tt.args.pattern)
+			n := len(tt.args.t.ErrorfCalls)
+			m := len(tt.args.t.FatalfCalls)
+
+			if n != tt.expectedErrorCalls {
+				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedErrorCalls, n)
+			}
+
+			if m != tt.expectedFatalCalls {
+				t.Errorf("expected %d calls to Fatalf(), got %d", tt.expectedFatalCalls, m)
+			}
+
+			if tt.args.t.HelperCalls != n+m {
+				t.Errorf("expected %d calls to Helper(), got %d", n+m, tt.args.t.HelperCalls)
 			}
 		})
 	}
