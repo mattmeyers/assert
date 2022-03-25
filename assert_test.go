@@ -931,8 +931,8 @@ func TestMapContains(t *testing.T) {
 				t.Errorf("expected %d calls to Errorf(), got %d", tt.expectedCalls, n)
 			}
 
-			if n != tt.args.t.HelperCalls {
-				t.Errorf("expected %d calls to Helper(), got %d", tt.expectedCalls, n)
+			if tt.args.t.HelperCalls != 1 {
+				t.Errorf("expected 1 call to Helper(), got %d", n)
 			}
 		})
 	}
