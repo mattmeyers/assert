@@ -6,10 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2022-03-26
+### Added
+- `RegexMatches` assertion with expression caching
+
 ## [0.1.0] - 2022-03-23
 ### Added
 - Initial assertions
 - `FatalTB` wrapper for making assertions fatal
 
-[Unreleased]: https://github.com/mattmeyers/assert/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/mattmeyers/assert/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/mattmeyers/asser/releases/tag/v0.2.0
 [0.1.0]: https://github.com/mattmeyers/asser/releases/tag/v0.1.0
